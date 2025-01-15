@@ -4,7 +4,8 @@ import styled from "styled-components";
 const SideNav = styled.aside`
     display: flex;
     flex-direction: column;
-    padding: 0.5rem;
+    padding-right: 1rem;
+    padding-top: 6rem;
     background: #F4F7FC;
     box-shadow: 0px 6px 3px 0px #4B515B26;
     box-shadow: 0px 1px 3px 0px #00000026;

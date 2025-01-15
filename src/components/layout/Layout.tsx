@@ -1,10 +1,10 @@
 import { PropsWithChildren } from "react";
 import styled from "styled-components";
-import NavSideBar from "./components/layout/NavSideBar";
-import TopSection from "./components/layout/TopSection";
-import TableSection from "./components/layout/TableSection";
-import FooterSection from "./components/layout/FooterSection";
-import MainSection from "./components/layout/MainSection";
+import NavSideBar from "./NavSideBar/NavSideBar";
+import TopSection from "./TopSection/TopSection";
+import TableSection from "./TableSection/TableSection";
+import FooterSection from "./FooterSection/FooterSection";
+import MainSection from "./MainSection/MainSection";
 
 const LayoutContainer = styled.div`
     display: grid;
