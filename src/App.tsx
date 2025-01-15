@@ -7,18 +7,27 @@ import TopSection from "./components/layout/TopSection/TopSection";
 import { ROUTES } from "./routes";
 import { NavItem } from "./components/NavItem/NavItem";
 import { TableContainer } from "./components/Table/TableContainer";
+import TopSectionContentContainer from "./components/TopSectionContent/TopSectionContentContainer";
+import { Title } from "./components/TopSectionContent/Title";
+import UserInputs from "./components/TopSectionContent/UserInputs";
 
 const LayoutContainer = styled.div`
-    display: grid;
-    grid-template-columns: 14.5rem 1fr;
-    height: 100vh;
+  display: grid;
+  grid-template-columns: 14.5rem 1fr;
+  height: 100vh;
 `;
+
 function App() {
   return (
     <LayoutContainer>
-      <NavSideBar>{ROUTES.map(({ path, icon, name }) => <NavItem path={path} icon={icon} name={name} />)}</NavSideBar>
+      <NavSideBar>{ROUTES.map(({ path, icon, name }) => <NavItem key={path} path={path} icon={icon} name={name} />)}</NavSideBar>
       <MainSection>
-        <TopSection>top section</TopSection>
+        <TopSection>
+          <TopSectionContentContainer>
+            <Title />
+            <UserInputs />
+          </TopSectionContentContainer>
+        </TopSection>
         <TableSection>
           <TableContainer />
         </TableSection>

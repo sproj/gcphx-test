@@ -10,8 +10,8 @@ export type RouteDescriptor = {
 }
 
 export const ROUTES: RouteDescriptor[] = [
-    { path: '/', name: 'All Cases', icon: TbBriefcase2 },
-    { path: 'pending', name: 'Pending Cases', icon: TbDotsCircleHorizontal },
-    { path: 'accepted', name: 'Accepted Cases', icon: TbCircleCheck },
-    { path: 'rejected', name: 'Rejected Cases', icon: TbCircleX }
+    { path: '/', name: 'All cases', icon: TbBriefcase2 },
+    { path: 'pending', name: 'Pending cases', icon: TbDotsCircleHorizontal },
+    { path: 'accepted', name: 'Accepted cases', icon: TbCircleCheck },
+    { path: 'rejected', name: 'Rejected cases', icon: TbCircleX }
 ]
