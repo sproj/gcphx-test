@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { SearchInput } from "./SearchInput";
+import SearchInput from "./SearchInput/SearchInput";
 import BatchActionButton from "./BatchActionButton/BatchActionButton";
 import ColumnsButton from "./ColumnsButton/ColumnsButton";
 

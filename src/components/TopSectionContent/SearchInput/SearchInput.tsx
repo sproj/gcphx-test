@@ -50,3 +50,5 @@ export const SearchInput: React.FC<{}> = () => {
         </InputWrapper>
     )
 }
+
+export default SearchInput
