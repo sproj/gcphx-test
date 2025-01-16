@@ -52,7 +52,8 @@ describe('fetchWithAbort', () => {
     // Abort the request
     controller.abort();
 
-    await expect(fetchPromise).rejects.toThrow('Aborted');
+    await expect(fetchPromise).resolves.toMatchObject({ aborted: true, data: null });
+    expect(controller.signal).toMatchObject({ aborted: true })
   });
 
   it('should include default headers', async () => {
@@ -72,4 +73,41 @@ describe('fetchWithAbort', () => {
     });
     expect(data).toEqual(mockResponse);
   });
+
+  it('should abort the request after the specified timeout', async () => {
+    jest.useFakeTimers();
+
+    // Mock fetch to simulate a long-running request
+    (global.fetch as jest.Mock).mockImplementation((_, { signal }) => {
+      return new Promise((_, reject) => {
+        // Simulate the abort triggering a rejection
+        signal?.addEventListener('abort', () => {
+          const abortError = new DOMException('Aborted', 'AbortError');
+          reject(abortError);
+        });
+      });
+    });
+
+    const url = '/timeout-test';
+    const timeout = 1000;
+
+    const fetchPromise = fetchWithAbort(url, {}, undefined, timeout);
+
+    // Fast-forward the timers to simulate the timeout
+    jest.advanceTimersByTime(timeout);
+
+    const result = await fetchPromise;
+
+    expect(result.aborted).toBe(true);
+    expect(result.data).toBeNull();
+    expect(global.fetch).toHaveBeenCalledWith(
+      url,
+      expect.objectContaining({
+        signal: expect.any(AbortSignal),
+      })
+    );
+
+    jest.useRealTimers();
+  });
+
 });
