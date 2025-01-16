@@ -8,9 +8,11 @@ export const theme: DefaultTheme = {
 
             border-radius: 6px;
             background: #2264E5;
+
             line-height: 20px;
             color: white;
             font-weight: 500;
+            font-size: 14px;
 
             display: flex;
             align-items: center;
@@ -32,9 +34,11 @@ export const theme: DefaultTheme = {
 
             border-radius: 6px;
             background: #7D90B2;
+            
             line-height: 20px;
             color: white;
             font-weight: 500;
+            font-size: 14px;
 
             display: flex;
             align-items: center;
