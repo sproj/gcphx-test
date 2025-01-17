@@ -48,7 +48,7 @@ interface DropdownProps {
 
 export const Dropdown = ({ children, isVisible, triggerRef }: DropdownProps) => {
     const [position, setPosition] = useState({ top: 0, left: 0 });
-    const [alignment, setAlignment] = useState({ isFlippedX: false, isFlippedY: false });
+    const [_, setAlignment] = useState({ isFlippedX: false, isFlippedY: false });
 
     useEffect(() => {
         if (isVisible && triggerRef.current) {
