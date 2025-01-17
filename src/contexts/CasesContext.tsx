@@ -1,7 +1,7 @@
 import { createContext, ReactNode, useContext, useEffect } from 'react';
 import { useCasesStore } from '../stores/casesStore';
 import { Case, CaseStatus } from '../types/Case';
-import { fetchCases, updateCases, mapDTOToCase } from '../clients/casesClient';
+import { fetchCases, updateCases, mapDTOToCase, mapStatusToSet } from '../clients/casesClient';
 import { useAsync } from '../hooks/useAsync';
 
 type CasesContextValue = {
@@ -22,36 +22,36 @@ export const CasesProvider = ({ children }: { children: ReactNode }) => {
 
     const { run, isLoading: loading, error } = useAsync();
 
-    const fetchAllCases = async () => {
-        const response = await fetchCases();
-        const normalizedCases: Record<string, Case> = {};
-        const pendingIds = new Set<string>();
-        const acceptedIds = new Set<string>();
-        const rejectedIds = new Set<string>();
+    const fetchAllCases = async (signal?: AbortSignal) => {
+        try {
+            const response = await fetchCases(signal);
 
-        for (const dto of response.data) {
-            const mappedCase = mapDTOToCase(dto);
-            normalizedCases[mappedCase.caseName] = mappedCase;
+            const normalizedCases: Record<string, Case> = {};
+            const statusSets = {
+                pending: new Set<string>(),
+                accepted: new Set<string>(),
+                rejected: new Set<string>(),
+            };
 
-            switch (dto.status) {
-                case 'In Progress':
-                    pendingIds.add(mappedCase.caseName);
-                    break;
-                case 'Accepted':
-                    acceptedIds.add(mappedCase.caseName);
-                    break;
-                case 'Rejected':
-                    rejectedIds.add(mappedCase.caseName);
-                    break;
+            for (const dto of response.data) {
+                const mappedCase = mapDTOToCase(dto);
+
+                normalizedCases[mappedCase.caseName] = mappedCase;
+
+                mapStatusToSet(dto.status, mappedCase.caseName, statusSets);
+
             }
-        }
 
-        useCasesStore.setState({
-            casesById: normalizedCases,
-            pendingIds,
-            acceptedIds,
-            rejectedIds,
-        });
+            useCasesStore.setState({
+                casesById: normalizedCases,
+                pendingIds: statusSets.pending,
+                acceptedIds: statusSets.accepted,
+                rejectedIds: statusSets.rejected,
+            });
+        } catch (e) {
+            console.error('Failed to fetch cases: ', e)
+            throw e
+        }
     };
 
     const updateCasesHandler = async (ids: string[], status: CaseStatus) => {
@@ -79,7 +79,9 @@ export const CasesProvider = ({ children }: { children: ReactNode }) => {
     };
 
     useEffect(() => {
-        run(fetchAllCases);
+        const controller = new AbortController();
+        run(async () => fetchAllCases(controller.signal));
+        return () => controller.abort()
     }, [run]);
 
     return (

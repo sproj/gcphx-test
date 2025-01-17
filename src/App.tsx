@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { Navigate, Route, Routes } from 'react-router';
 import FooterSection from "./components/layout/FooterSection/FooterSection";
 import MainSection from "./components/layout/MainSection/MainSection";
 import NavSideBar from "./components/layout/NavSideBar/NavSideBar";
@@ -10,6 +11,7 @@ import { TableContainer } from "./components/Table/TableContainer";
 import TopSectionContentContainer from "./components/TopSectionContent/TopSectionContentContainer";
 import { Title } from "./components/TopSectionContent/Title";
 import UserInputs from "./components/TopSectionContent/UserInputs";
+import { CasesProvider } from "./contexts/CasesContext";
 
 const LayoutContainer = styled.div`
   display: grid;
@@ -29,7 +31,15 @@ function App() {
           </TopSectionContentContainer>
         </TopSection>
         <MainViewport>
-          <TableContainer />
+          <CasesProvider>
+            <Routes>
+              <Route index element={<Navigate to="/pending" />} />
+              <Route path="all" element={<TableContainer status={'all'} />} />
+              <Route path="pending" element={<TableContainer status={'pending'} />} />
+              <Route path="accepted" element={<TableContainer status={'accepted'} />} />
+              <Route path="rejected" element={<TableContainer status={'rejected'} />} />
+            </Routes>
+          </CasesProvider>
         </MainViewport>
         <FooterSection>footer</FooterSection>
       </MainSection>

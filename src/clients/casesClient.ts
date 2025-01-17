@@ -1,8 +1,22 @@
 import { fetchWithAbort } from '../utils/fetchWithAbort';
 import { CaseDTO, GetRequestResponse, UpdateCasesRequest, UpdateCasesResponse, CaseStatus, Case } from '../types/Case';
 
+const ENDPOINTS = {
+    cases: {
+        uri: `/api`,
+        port: 3000,
+        endpoints: {
+            fetchCases: { endpoint: 'requests', verb: 'GET', contentType: 'application/json' },
+            updateCases: { endpoint: 'update-status', verb: 'PUT', contentType: 'application/json' }
+        }
+    }
+}
+
 export const fetchCases = async (signal?: AbortSignal): Promise<GetRequestResponse> => {
-    const { data, aborted } = await fetchWithAbort<GetRequestResponse>('/requests', { signal });
+    const { uri } = ENDPOINTS.cases;
+    const { endpoint } = ENDPOINTS.cases.endpoints.fetchCases;
+
+    const { data, aborted } = await fetchWithAbort<GetRequestResponse>(`${uri}/${endpoint}`, { signal });
     if (aborted) {
         console.info('Fetch cases request aborted');
         throw new DOMException('AbortError');
@@ -12,9 +26,12 @@ export const fetchCases = async (signal?: AbortSignal): Promise<GetRequestRespon
 };
 
 export const updateCases = async (body: UpdateCasesRequest, signal?: AbortSignal): Promise<UpdateCasesResponse> => {
-    const { data, aborted } = await fetchWithAbort<UpdateCasesResponse>('/update-status', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+    const { uri } = ENDPOINTS.cases;
+    const { endpoint, verb, contentType } = ENDPOINTS.cases.endpoints.updateCases;
+
+    const { data, aborted } = await fetchWithAbort<UpdateCasesResponse>(`${uri}/${endpoint}`, {
+        method: `${verb}`,
+        headers: { 'Content-Type': `${contentType}` },
         body: JSON.stringify(body),
         signal,
     });
@@ -38,43 +55,16 @@ export const mapDTOToCase = (dto: CaseDTO): Case => ({
     lastUpdated: dto.lastUpdated ? new Date(dto.lastUpdated) : null,
 });
 
-export const normalizeCases = (data: CaseDTO[]) => {
-    const normalizedCases: Record<string, Case> = {};
-    const pendingIds = new Set<string>();
-    const acceptedIds = new Set<string>();
-    const rejectedIds = new Set<string>();
-
-    for (const dto of data) {
-        const mappedCase: Case = {
-            caseName: dto.caseName,
-            priority: dto.priority === 'High' ? 1 : 0,
-            assignee: dto.assignee,
-            description: dto.description,
-            status:
-                dto.status === 'In Progress'
-                    ? CaseStatus.InProgress
-                    : dto.status === 'Accepted'
-                        ? CaseStatus.Accepted
-                        : CaseStatus.Rejected,
-            type: dto.type,
-            dateCreated: new Date(dto.dateCreated),
-            lastUpdated: dto.lastUpdated ? new Date(dto.lastUpdated) : null,
-        };
-
-        normalizedCases[mappedCase.caseName] = mappedCase;
-
-        switch (dto.status) {
-            case 'In Progress':
-                pendingIds.add(mappedCase.caseName);
-                break;
-            case 'Accepted':
-                acceptedIds.add(mappedCase.caseName);
-                break;
-            case 'Rejected':
-                rejectedIds.add(mappedCase.caseName);
-                break;
-        }
+export const mapStatusToSet = (status: string, caseName: string, statusSets: { [key: string]: Set<string> }) => {
+    switch (status) {
+        case 'In Progress':
+            statusSets.pending.add(caseName);
+            break;
+        case 'Accepted':
+            statusSets.accepted.add(caseName);
+            break;
+        case 'Rejected':
+            statusSets.rejected.add(caseName);
+            break;
     }
-
-    return { normalizedCases, pendingIds, acceptedIds, rejectedIds };
 };
