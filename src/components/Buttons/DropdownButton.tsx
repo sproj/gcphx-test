@@ -16,12 +16,12 @@ const ButtonContainer = styled.div`
   display: inline-block;
 `;
 
-const Dropdown = styled.div<{ isVisible: boolean }>`
+const Dropdown = styled.div<{ $isVisible: boolean }>`
     position: absolute;
     top: calc(100% + 2px); 
     right: 0; 
 
-    display: ${({ isVisible }) => (isVisible ? 'flex' : 'none')};
+    display: ${({ $isVisible }) => ($isVisible ? 'flex' : 'none')};
     flex-direction: column;
 
     gap: 0.25rem;
@@ -63,7 +63,7 @@ const DropdownButton: React.FC<PropsWithChildren<DropdownButtonProps>> = ({
                 {label}
                 {isVisible ? openIcon : closeIcon}
             </ButtonComponent>
-            <Dropdown isVisible={isVisible} onMouseLeave={closeDropdown}>
+            <Dropdown $isVisible={isVisible} onMouseLeave={closeDropdown}>
                 {React.Children.map(children, child => <DropdownItem>{child}</DropdownItem>)}
             </Dropdown>
         </ButtonContainer>

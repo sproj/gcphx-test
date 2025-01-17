@@ -1,6 +1,6 @@
 import { TbSearch } from "react-icons/tb";
 import styled from "styled-components"
-import PrimaryButton from "../Buttons/PrimaryButton";
+import PrimaryButton from '../../Buttons/PrimaryButton'
 
 const InputWrapper = styled.div`
   position: relative;
