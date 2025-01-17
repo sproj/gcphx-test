@@ -46,8 +46,10 @@ export const TableRow = <T extends HasId<string>,>({ row, columns }: TableRowPro
             <StyledCell style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'visible' }}>
                 <DropdownButton
                     buttonType='icon'
-                    label={<IconButton><TbDots color='black'/></IconButton>}>
-                    <span>accept</span><span>reject</span>
+                    label={<IconButton><TbDots color='black' /></IconButton>}
+                >
+                    <span>Accept case</span>
+                    <span>Reject case</span>
                 </DropdownButton>
             </StyledCell>
         </StyledRow >

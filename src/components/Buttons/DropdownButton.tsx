@@ -5,7 +5,6 @@ import PrimaryButton from './PrimaryButton';
 import SecondaryButton from './SecondaryButton';
 import IconButton from './IconButton';
 import TertiaryButton from './TertiaryButton';
-import { TbCaretDownFilled, TbCaretUpFilled } from "react-icons/tb";
 
 interface DropdownButtonProps {
     buttonType: 'primary' | 'secondary' | 'tertiary' | 'icon';
@@ -29,6 +28,8 @@ const DropdownDiv = styled.div<{ $isVisible: boolean; $top: number; $left: numbe
 
     gap: 0.25rem;
 
+    margin-top: 4px;
+
     background-color: white;
     border: 1px solid #ccc;
     border-radius: 4px;
@@ -47,14 +48,33 @@ interface DropdownProps {
 
 export const Dropdown = ({ children, isVisible, triggerRef }: DropdownProps) => {
     const [position, setPosition] = useState({ top: 0, left: 0 });
+    const [alignment, setAlignment] = useState({ isFlippedX: false, isFlippedY: false });
 
     useEffect(() => {
         if (isVisible && triggerRef.current) {
             const rect = triggerRef.current.getBoundingClientRect();
-            setPosition({
-                top: rect.bottom + window.scrollY,
-                left: rect.left + window.scrollX,
-            });
+            const dropdownWidth = 200; // Approximate width of the dropdown
+            const dropdownHeight = 150; // Approximate height of the dropdown
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+
+            // Calculate default positions
+            let top = rect.bottom + window.scrollY;
+            let left = rect.left + window.scrollX;
+
+            // Adjust for right overflow
+            if (rect.right + dropdownWidth > viewportWidth) {
+                left = rect.right - dropdownWidth + window.scrollX;
+                setAlignment((prev) => ({ ...prev, isFlippedX: true }));
+            }
+
+            // Adjust for bottom overflow
+            if (rect.bottom + dropdownHeight > viewportHeight) {
+                top = rect.top - dropdownHeight + window.scrollY;
+                setAlignment((prev) => ({ ...prev, isFlippedY: true }));
+            }
+
+            setPosition({ top, left });
         }
     }, [isVisible, triggerRef]);
 
