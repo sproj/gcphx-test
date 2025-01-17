@@ -3,6 +3,9 @@ import { TableProps } from './TableWrapper';
 import { Checkbox } from '../Checkbox/Checkbox';
 import { HasId } from '../../types/HasId';
 import { useCases } from '../../contexts/CasesContext';
+import DropdownButton from '../Buttons/DropdownButton';
+import { TbDots } from 'react-icons/tb';
+import IconButton from '../Buttons/IconButton';
 
 export const StyledRow = styled.tr<{ $columnWidths: string }>`
     display: grid;
@@ -35,16 +38,19 @@ export type TableRowProps<T> = {
 export const TableRow = <T extends HasId<string>,>({ row, columns }: TableRowProps<T>) => {
     const { isCaseSelected, toggleCaseSelection } = useCases()
     const columnWidths = columns.map((col) => `${col.colWidth || 2}fr`).join(' ');
+
     return (
         <StyledRow $columnWidths={`1fr ${columnWidths} 1fr`}>
             <StyledCell><Checkbox checked={isCaseSelected(row.id)} onChange={() => toggleCaseSelection(row.id)} indeterminate={false} /></StyledCell>
             {columns.map((column) => <StyledCell key={String(column.key)}>{`${row[column.key] as any}`}</StyledCell>)}
-            <StyledCell>
-                {/* Replace with actual action handlers */}
-                <button>Accept</button>
-                <button>Reject</button>
+            <StyledCell style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'visible' }}>
+                <DropdownButton
+                    buttonType='icon'
+                    label={<IconButton><TbDots color='black'/></IconButton>}>
+                    <span>accept</span><span>reject</span>
+                </DropdownButton>
             </StyledCell>
-        </StyledRow>
+        </StyledRow >
     );
 };
 

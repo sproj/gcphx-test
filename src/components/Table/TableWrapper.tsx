@@ -15,7 +15,7 @@ export type TableColumn<T> = {
 };
 
 const Wrapper = styled.div`
-    overflow-x: auto; /* Enable horizontal scrolling for narrow screens */
+    overflow-x: auto;
     max-width: 100%;
 `;
 

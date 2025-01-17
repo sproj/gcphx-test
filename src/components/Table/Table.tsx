@@ -7,6 +7,8 @@ import { HasId } from '../../types/HasId';
 const StyledTable = styled.table`
     width: 100%;
     border-collapse: collapse;
+    z-index: 1;
+    position: relative;
 `;
 
 export const Table = <T extends HasId<string>,>({ data, columns, selectedRowIds }: TableProps<T>) => {

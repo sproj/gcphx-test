@@ -3,7 +3,7 @@ import { useCases } from '../../contexts/CasesContext';
 import { TableWrapper } from './TableWrapper';
 
 export const TableContainer: React.FC<{}> = () => {
-    const { loading, error, casesById, acceptedIds, pendingIds, rejectedIds, columns, selectedCases } = useCases();
+    const { loading, error, casesById, columns, selectedCases } = useCases();
 
     if (loading) return <p>Loading cases...</p>; // Placeholder text (no loaders as per requirement)
     if (error) return <p>Failed to load cases: {error.message}</p>;
