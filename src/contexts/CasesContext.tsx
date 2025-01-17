@@ -1,5 +1,5 @@
 import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo } from 'react';
-import { CasesState, useCasesStore } from '../stores/casesStore';
+import { CasesState, CaseTableColumns, useCasesStore } from '../stores/casesStore';
 import { Case, CaseStatus } from '../types/Case';
 import { updateCases, mapDTOToCase, mapStatusToSet, getCases, FetchCasesParams } from '../clients/casesClient';
 import { useAsync } from '../hooks/useAsync';
@@ -8,6 +8,7 @@ import { useLocation } from 'react-router';
 export type CurrentView = CaseStatus | 'all'
 
 type CasesContextValue = {
+    visibleColumns: CaseTableColumns;
     updateCases: (ids: string[], status: CaseStatus) => Promise<void>;
     searchCases: (query: string) => void;
     loading: boolean;
@@ -27,6 +28,7 @@ export const CasesProvider = ({ children }: { children: ReactNode }) => {
         rejectedIds,
         selectedCases,
         columns,
+        toggleColumnVisible,
         updateCasesOptimistically,
         resetRecentlyUpdated,
         setSearchQuery,
@@ -48,6 +50,8 @@ export const CasesProvider = ({ children }: { children: ReactNode }) => {
     const currentView = useMemo(() => pathNameToView(location.pathname), [location.pathname])
 
     const { run, isLoading: loading, error } = useAsync();
+
+    const visibleColumns = useMemo(() => columns.filter(col => col.visible), [columns])
 
     const fetchCases = useCallback(async (params: Partial<FetchCasesParams>, signal?: AbortSignal) => {
         try {
@@ -103,9 +107,10 @@ export const CasesProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
-    const searchCases = (query: string) => {
+    const searchCases = useCallback((query: string) => {
         setSearchQuery(query);
-    };
+        fetchCases({ search: query })
+    }, [fetchCases]);
 
     const nextPage = useCallback(async () => {
         if (currentPage >= Math.ceil(totalRecordCount / pageSize)) return;
@@ -139,6 +144,8 @@ export const CasesProvider = ({ children }: { children: ReactNode }) => {
                 acceptedIds,
                 rejectedIds,
                 columns,
+                visibleColumns,
+                toggleColumnVisible,
                 updateCases: updateCasesHandler,
                 searchCases,
                 toggleCaseSelection,

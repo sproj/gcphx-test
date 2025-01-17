@@ -3,7 +3,7 @@ import { useCases } from '../../contexts/CasesContext';
 import { TableWrapper } from './TableWrapper';
 
 export const TableContainer: React.FC<{}> = () => {
-    const { loading, error, casesById, columns, selectedCases } = useCases();
+    const { loading, error, casesById, visibleColumns, selectedCases } = useCases();
 
     if (loading) return <p>Loading cases...</p>; // Placeholder text (no loaders as per requirement)
     if (error) return <p>Failed to load cases: {error.message}</p>;
@@ -11,5 +11,5 @@ export const TableContainer: React.FC<{}> = () => {
 
     const caseList = Object.values(casesById)
 
-    return <TableWrapper data={caseList} columns={columns} selectedRowIds={selectedCases} />;
+    return <TableWrapper data={caseList} columns={visibleColumns as any} selectedRowIds={selectedCases} />;
 };

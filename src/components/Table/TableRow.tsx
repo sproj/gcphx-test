@@ -49,8 +49,8 @@ export const TableRow = <T extends HasId<string>,>({ row, columns }: TableRowPro
                     buttonType='icon'
                     label={<IconButton><TbDots color='black' /></IconButton>}
                 >
-                    <span onClick={() => updateCases([row.id], CaseStatus.Accepted)}>Accept case</span>
-                    <span onClick={() => updateCases([row.id], CaseStatus.Rejected)}>Reject case</span>
+                    <div onClick={() => updateCases([row.id], CaseStatus.Accepted)} style={{width: '100%'}}>Accept case</div>
+                    <div onClick={() => updateCases([row.id], CaseStatus.Rejected)}>Reject case</div>
                 </DropdownButton>
             </StyledCell>
         </StyledRow >

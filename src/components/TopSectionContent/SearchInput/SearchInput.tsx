@@ -1,6 +1,8 @@
 import { TbSearch } from "react-icons/tb";
 import styled from "styled-components"
 import PrimaryButton from '../../Buttons/PrimaryButton'
+import { useEffect, useState } from "react";
+import { useCases } from "../../../contexts/CasesContext";
 
 const InputWrapper = styled.div`
   position: relative;
@@ -40,15 +42,40 @@ const StyledSearchButton = styled(PrimaryButton)`
 `
 
 export const SearchInput: React.FC<{}> = () => {
-    return (
-        <InputWrapper>
-            <IconWrapper>
-                <TbSearch size={20} />
-            </IconWrapper>
-            <StyledSearchInput placeholder="Search..." />
-            <StyledSearchButton>Search</StyledSearchButton>
-        </InputWrapper>
-    )
+
+  const { searchCases } = useCases()
+
+  const [inputValue, setInputValue] = useState("");
+  const [debouncedValue, setDebouncedValue] = useState("");
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(inputValue);
+    }, 500);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [inputValue]);
+
+  useEffect(() => {
+    if (debouncedValue.trim() !== "") {
+      searchCases(debouncedValue);
+    }
+  }, [debouncedValue, searchCases]);
+  return (
+    <InputWrapper>
+      <IconWrapper>
+        <TbSearch size={20} />
+      </IconWrapper>
+      <StyledSearchInput
+        placeholder="Search..."
+        value={inputValue}
+        onChange={(e) => setInputValue(e.target.value)}
+      />
+      <StyledSearchButton onClick={() => searchCases(inputValue)}>Search</StyledSearchButton>
+    </InputWrapper>
+  )
 }
 
 export default SearchInput

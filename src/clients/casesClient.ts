@@ -87,8 +87,8 @@ export const mapDTOToCase = (dto: CaseDTO): Case => ({
     status: dto.status === 'In Progress' ? CaseStatus.InProgress :
         dto.status === 'Accepted' ? CaseStatus.Accepted : CaseStatus.Rejected,
     type: dto.type,
-    dateCreated: new Date(dto.dateCreated),
-    lastUpdated: dto.lastUpdated ? new Date(dto.lastUpdated) : null,
+    dateCreated: dto.dateCreated,
+    lastUpdated: dto.lastUpdated ? dto.lastUpdated : null,
 });
 
 export const mapStatusToSet = (status: string, caseName: string, statusSets: { [key: string]: Set<string> }) => {

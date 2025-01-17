@@ -8,7 +8,6 @@ export type CasesState = {
     rejectedIds: Set<string>;
 
     searchQuery: string;
-    columns: CaseTableColumns;
     selectedCases: Set<string>;
     recentlyUpdated: Set<string>;
 
@@ -16,7 +15,9 @@ export type CasesState = {
     totalRecordCount: number;
     pageSize: 10;
 
-    // Existing functions
+    columns: CaseTableColumns;
+    toggleColumnVisible: (key: keyof Case) => void,
+
     updateCasesOptimistically: (ids: string[], status: CaseStatus) => void;
     resetRecentlyUpdated: () => void;
     setSearchQuery: (query: string) => void;
@@ -31,13 +32,29 @@ export type CasesState = {
 };
 
 
-export type CaseTableColumns = Array<{ key: keyof Case, label: string, colWidth?: 1 | 2 | 3; }>
+export type CaseTableColumns = Array<{ key: keyof Case, label: string, colWidth?: 1 | 2 | 3, visible: boolean }>
+
+
+const LOCAL_STORAGE_KEY = 'caseTableColumns';
+
+const getColumnsFromLocalStorage = (): CaseTableColumns => {
+    const storedColumns = localStorage.getItem(LOCAL_STORAGE_KEY);
+    return storedColumns ? JSON.parse(storedColumns) : defaultColumns;
+};
+
+const saveColumnsToLocalStorage = (columns: CaseTableColumns) => {
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(columns));
+};
 
 const defaultColumns: CaseTableColumns = [
-    { key: 'caseName', label: 'Case Name' },
-    { key: 'assignee', label: 'Assignee' },
-    { key: 'description', label: 'Description', colWidth: 3 },
-    { key: 'dateCreated', label: 'Date Created' },
+    { key: 'priority', label: 'Priority', visible: false },
+    { key: 'caseName', label: 'Case Name', visible: true },
+    { key: 'assignee', label: 'Assignee', visible: true },
+    { key: 'description', label: 'Description', colWidth: 3, visible: true },
+    { key: 'dateCreated', label: 'Date Created', visible: true },
+    { key: 'status', label: 'Status', visible: false },
+    { key: 'type', label: 'Type', visible: false },
+    { key: 'lastUpdated', label: 'Last Updated', visible: false },
 ]
 
 export const useCasesStore = create<CasesState>((set, get) => ({
@@ -46,9 +63,26 @@ export const useCasesStore = create<CasesState>((set, get) => ({
     acceptedIds: new Set(),
     rejectedIds: new Set(),
     searchQuery: '',
-    columns: defaultColumns,
+    columns: getColumnsFromLocalStorage() || defaultColumns,
     selectedCases: new Set(),
     recentlyUpdated: new Set(),
+
+    toggleColumnVisible: (key: keyof Case) => {
+        set((state) => {
+            const updatedColumns = state.columns.map(col => {
+                if (col.key === key) {
+                    col.visible = !col.visible
+                }
+                return col
+            })
+
+            saveColumnsToLocalStorage(updatedColumns);
+
+            return {
+                columns: updatedColumns
+            }
+        })
+    },
 
     setSearchQuery: (query) => set({ searchQuery: query }),
 

@@ -8,8 +8,8 @@ export interface Case extends HasId<string> {
     description: string;
     status: CaseStatus;
     type: string;
-    dateCreated: Date;
-    lastUpdated: Date | null;
+    dateCreated: string;
+    lastUpdated: string | null;
 }
 
 export enum CaseStatus {

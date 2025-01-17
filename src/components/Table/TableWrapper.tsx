@@ -11,7 +11,8 @@ export type TableProps<T> = {
 export type TableColumn<T> = {
     key: keyof T;
     label: string;
-    colWidth: number
+    colWidth: number;
+    visible: boolean;
 };
 
 const Wrapper = styled.div`

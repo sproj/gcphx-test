@@ -24,12 +24,5 @@ export const Title: React.FC<{}> = () => {
 }
 
 const pathToTitle = (path: ValidRoutePath) => {
-    switch (path) {
-        case '/': {
-            return 'All cases'
-        }
-        default: {
-            return `${path.charAt(1).toLocaleUpperCase() + path.slice(2)} cases`
-        }
-    }
+    return `${path.charAt(1).toLocaleUpperCase() + path.slice(2)} cases`
 }
