@@ -2,7 +2,7 @@ import styled from "styled-components";
 import FooterSection from "./components/layout/FooterSection/FooterSection";
 import MainSection from "./components/layout/MainSection/MainSection";
 import NavSideBar from "./components/layout/NavSideBar/NavSideBar";
-import TableSection from "./components/layout/TableSection/TableSection";
+import MainViewport from "./components/layout/MainViewport/MainViewport";
 import TopSection from "./components/layout/TopSection/TopSection";
 import { ROUTES } from "./routes";
 import { NavItem } from "./components/NavItem/NavItem";
@@ -28,9 +28,9 @@ function App() {
             <UserInputs />
           </TopSectionContentContainer>
         </TopSection>
-        <TableSection>
+        <MainViewport>
           <TableContainer />
-        </TableSection>
+        </MainViewport>
         <FooterSection>footer</FooterSection>
       </MainSection>
     </LayoutContainer>
