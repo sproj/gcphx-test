@@ -6,6 +6,7 @@ import { useCases } from '../../contexts/CasesContext';
 import DropdownButton from '../Buttons/DropdownButton';
 import { TbDots } from 'react-icons/tb';
 import IconButton from '../Buttons/IconButton';
+import { CaseStatus } from '../../types/Case';
 
 export const StyledRow = styled.tr<{ $columnWidths: string }>`
     display: grid;
@@ -36,7 +37,7 @@ export type TableRowProps<T> = {
 } & Omit<TableProps<T>, 'data'>
 
 export const TableRow = <T extends HasId<string>,>({ row, columns }: TableRowProps<T>) => {
-    const { isCaseSelected, toggleCaseSelection } = useCases()
+    const { isCaseSelected, toggleCaseSelection, updateCases } = useCases()
     const columnWidths = columns.map((col) => `${col.colWidth || 2}fr`).join(' ');
 
     return (
@@ -48,8 +49,8 @@ export const TableRow = <T extends HasId<string>,>({ row, columns }: TableRowPro
                     buttonType='icon'
                     label={<IconButton><TbDots color='black' /></IconButton>}
                 >
-                    <span>Accept case</span>
-                    <span>Reject case</span>
+                    <span onClick={() => updateCases([row.id], CaseStatus.Accepted)}>Accept case</span>
+                    <span onClick={() => updateCases([row.id], CaseStatus.Rejected)}>Reject case</span>
                 </DropdownButton>
             </StyledCell>
         </StyledRow >
