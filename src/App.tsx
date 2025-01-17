@@ -12,6 +12,8 @@ import TopSectionContentContainer from "./components/TopSectionContent/TopSectio
 import { Title } from "./components/TopSectionContent/Title";
 import UserInputs from "./components/TopSectionContent/UserInputs";
 import { CasesProvider } from "./contexts/CasesContext";
+import { CaseCounter } from "./components/FooterContent/CaseCounter";
+import { PageControls } from "./components/FooterContent/PageControls";
 
 const LayoutContainer = styled.div`
   display: grid;
@@ -23,27 +25,30 @@ function App() {
   return (
     <LayoutContainer>
       <NavSideBar>{ROUTES.map(({ path, icon, name }) => <NavItem key={path} path={path} icon={icon} name={name} />)}</NavSideBar>
-      <MainSection>
-        <TopSection>
-          <TopSectionContentContainer>
-            <Title />
-            <UserInputs />
-          </TopSectionContentContainer>
-        </TopSection>
-        <MainViewport>
-          <CasesProvider>
+      <CasesProvider>
+        <MainSection>
+          <TopSection>
+            <TopSectionContentContainer>
+              <Title />
+              <UserInputs />
+            </TopSectionContentContainer>
+          </TopSection>
+          <MainViewport>
             <Routes>
               <Route index element={<Navigate to="/pending" />} />
-              <Route path="all" element={<TableContainer status={'all'} />} />
-              <Route path="pending" element={<TableContainer status={'pending'} />} />
-              <Route path="accepted" element={<TableContainer status={'accepted'} />} />
-              <Route path="rejected" element={<TableContainer status={'rejected'} />} />
+              <Route path="all" element={<TableContainer />} />
+              <Route path="pending" element={<TableContainer />} />
+              <Route path="accepted" element={<TableContainer />} />
+              <Route path="rejected" element={<TableContainer />} />
             </Routes>
-          </CasesProvider>
-        </MainViewport>
-        <FooterSection>footer</FooterSection>
-      </MainSection>
-    </LayoutContainer>
+          </MainViewport>
+          <FooterSection>
+            <CaseCounter />
+            <PageControls />
+          </FooterSection>
+        </MainSection>
+      </CasesProvider>
+    </LayoutContainer >
   )
 }
 

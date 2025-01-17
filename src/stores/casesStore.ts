@@ -1,36 +1,60 @@
 import { create } from 'zustand';
 import { Case, CaseStatus } from '../types/Case';
 
-type CasesState = {
+export type CasesState = {
     casesById: Record<string, Case>;
     pendingIds: Set<string>;
     acceptedIds: Set<string>;
     rejectedIds: Set<string>;
 
     searchQuery: string;
-    columns: string[];
+    columns: CaseTableColumns;
     selectedCases: Set<string>;
     recentlyUpdated: Set<string>;
 
+    currentPage: number;
+    totalRecordCount: number;
+    pageSize: 10;
+
+    // Existing functions
     updateCasesOptimistically: (ids: string[], status: CaseStatus) => void;
     resetRecentlyUpdated: () => void;
-
     setSearchQuery: (query: string) => void;
+
+    toggleCaseSelection: (id: string) => void;
+    isCaseSelected: (id: string) => boolean;
+    selectAllCases: () => void;
+    clearAllSelections: () => void;
+
+    areAllCasesSelected: () => boolean;
+    areAnyCasesSelected: () => boolean;
 };
 
-export const useCasesStore = create<CasesState>((set) => ({
+
+export type CaseTableColumns = Array<{ key: keyof Case, label: string, colWidth?: 1 | 2 | 3; }>
+
+const defaultColumns: CaseTableColumns = [
+    { key: 'caseName', label: 'Case Name' },
+    { key: 'assignee', label: 'Assignee' },
+    { key: 'description', label: 'Description', colWidth: 3 },
+    { key: 'dateCreated', label: 'Date Created' },
+]
+
+export const useCasesStore = create<CasesState>((set, get) => ({
     casesById: {},
     pendingIds: new Set(),
     acceptedIds: new Set(),
     rejectedIds: new Set(),
     searchQuery: '',
-    columns: ['title', 'status', 'description'],
+    columns: defaultColumns,
     selectedCases: new Set(),
     recentlyUpdated: new Set(),
 
     setSearchQuery: (query) => set({ searchQuery: query }),
 
-
+    currentPage: 0,
+    totalRecordCount: 0,
+    pageSize: 10,
     /**
      * On a user updating data:
      *  - Perform the update in state optimistically.
@@ -62,7 +86,45 @@ export const useCasesStore = create<CasesState>((set) => ({
         });
     },
 
-    resetRecentlyUpdated: () => set({ recentlyUpdated: new Set() })
+    resetRecentlyUpdated: () => set({ recentlyUpdated: new Set() }),
+
+    toggleCaseSelection: (id: string) => {
+        set((state) => {
+            const updatedSelection = new Set(state.selectedCases);
+            if (updatedSelection.has(id)) {
+                updatedSelection.delete(id);
+            } else {
+                updatedSelection.add(id);
+            }
+            return { selectedCases: updatedSelection };
+        });
+    },
+
+    isCaseSelected: (id: string) => {
+        return get().selectedCases.has(id);
+    },
+
+    selectAllCases: () => {
+        set((state) => ({
+            selectedCases: new Set(Object.keys(state.casesById)),
+        }));
+    },
+
+    clearAllSelections: () => {
+        set({ selectedCases: new Set() });
+    },
+
+    areAllCasesSelected: () => {
+        const state = get();
+        return state.selectedCases.size === Object.keys(state.casesById).length;
+    },
+
+    areAnyCasesSelected: () => {
+        const state = get();
+        const totalCases = Object.keys(state.casesById).length;
+
+        return state.selectedCases.size > 0 && state.selectedCases.size < totalCases;
+    },
 }));
 
 /**
@@ -83,7 +145,7 @@ const moveCaseBetweenStatuses = (
             state.pendingIds.delete(id);
             break;
         case CaseStatus.Accepted:
-            state.acceptedIds.delete(id);
+            state.acceptedIds.delete(id)
             break;
         case CaseStatus.Rejected:
             state.rejectedIds.delete(id);

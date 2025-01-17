@@ -1,22 +1,32 @@
 import { fetchWithAbort } from '../utils/fetchWithAbort';
 import { CaseDTO, GetRequestResponse, UpdateCasesRequest, UpdateCasesResponse, CaseStatus, Case } from '../types/Case';
+import { CurrentView } from '../contexts/CasesContext';
 
 const ENDPOINTS = {
     cases: {
         uri: `/api`,
         port: 3000,
         endpoints: {
-            fetchCases: { endpoint: 'requests', verb: 'GET', contentType: 'application/json' },
+            getCases: { endpoint: 'requests', verb: 'GET', contentType: 'application/json' },
             updateCases: { endpoint: 'update-status', verb: 'PUT', contentType: 'application/json' }
         }
     }
 }
 
-export const fetchCases = async (signal?: AbortSignal): Promise<GetRequestResponse> => {
-    const { uri } = ENDPOINTS.cases;
-    const { endpoint } = ENDPOINTS.cases.endpoints.fetchCases;
+export type FetchCasesParams = {
+    status: CurrentView | 'all',
+    page: number,
+    limit: number,
+    search: string,
+    sort: keyof CaseDTO
+    sortOrder: 'asc' | 'desc'
+}
 
-    const { data, aborted } = await fetchWithAbort<GetRequestResponse>(`${uri}/${endpoint}`, { signal });
+export const getCases = async (queryParams: Partial<FetchCasesParams>, signal?: AbortSignal): Promise<GetRequestResponse> => {
+    const { uri } = ENDPOINTS.cases;
+    const { endpoint } = ENDPOINTS.cases.endpoints.getCases;
+
+    const { data, aborted } = await fetchWithAbort<GetRequestResponse>(`${uri}/${endpoint}${queryParamsToQueryString(queryParams)}`, { signal });
     if (aborted) {
         console.info('Fetch cases request aborted');
         throw new DOMException('AbortError');
@@ -24,6 +34,31 @@ export const fetchCases = async (signal?: AbortSignal): Promise<GetRequestRespon
     if (!data) throw new Error('No data returned from fetchCases');
     return data;
 };
+
+const queryParamsToQueryString = (params: Partial<FetchCasesParams>) => {
+    const qstring = [maybeSetLimit, maybeSetPage, maybeSetSearch, maybeSetSort, maybeSetSortOrder, maybeSetStatus].reduce((acc, f) => acc += f(params), `?`)
+    console.log({params}, qstring)
+    return qstring
+}
+
+const maybeSetLimit = ({ limit }: Partial<FetchCasesParams>) => limit ? `&limit=${limit}` : ''
+const maybeSetSearch = ({ search }: Partial<FetchCasesParams>) => search ? `&search=${search}` : ''
+const maybeSetPage = ({ page }: Partial<FetchCasesParams>) => page ? `&page=${page}` : ''
+const maybeSetSort = ({ sort }: Partial<FetchCasesParams>) => sort ? `&sort=${sort}` : ''
+const maybeSetSortOrder = ({ sortOrder }: Partial<FetchCasesParams>) => sortOrder ? `&order=${sortOrder}` : ''
+const maybeSetStatus = ({ status }: Partial<FetchCasesParams>) => {
+    switch (status) {
+        case 'all': {
+            return ''
+        }
+        case undefined: {
+            return ''
+        }
+        default: {
+            return `&status=${status.toString().toLowerCase()}`
+        }
+    }
+}
 
 export const updateCases = async (body: UpdateCasesRequest, signal?: AbortSignal): Promise<UpdateCasesResponse> => {
     const { uri } = ENDPOINTS.cases;
@@ -44,6 +79,7 @@ export const updateCases = async (body: UpdateCasesRequest, signal?: AbortSignal
 };
 
 export const mapDTOToCase = (dto: CaseDTO): Case => ({
+    id: dto.caseName,
     caseName: dto.caseName,
     priority: dto.priority === 'High' ? 1 : 0, // Adjust as needed
     assignee: dto.assignee,

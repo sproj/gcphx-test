@@ -44,6 +44,19 @@ export const theme: DefaultTheme = {
             align-items: center;
 
             border: 1px solid #5F7CB0
+      `,
+      tertiary: css`
+        border-radius: 6px;
+        gap: 8px;
+        padding: 2px 4px;
+
+        background: #FFFFFF;
+
+        box-shadow: 0px 2px 5px 0px #5960781A;
+
+        box-shadow: 0px 0px 0px 1px #464F6029;
+
+        box-shadow: 0px 1px 1px 0px #0000001A;
       `
     },
 };

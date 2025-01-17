@@ -1,4 +1,7 @@
-export interface Case {
+import { HasId } from "./HasId";
+
+export interface Case extends HasId<string> {
+    id: string;
     caseName: string;
     priority: CasePriority;
     assignee: string;
